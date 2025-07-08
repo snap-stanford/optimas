@@ -10,7 +10,7 @@
 <div align="left">
 
 [![](https://img.shields.io/badge/website-Optimas-purple?style=plastic&logo=Google%20chrome)](https://optimas.stanford.edu/)
-[![](https://img.shields.io/badge/Arxiv-paper-red?style=plastic&logo=arxiv)](https://arxiv.org/abs/2404.13207)
+[![](https://img.shields.io/badge/Arxiv-paper-red?style=plastic&logo=arxiv)](https://arxiv.org/abs/2507.03041)
 [![](https://img.shields.io/badge/pip-optimas--ai-brightgreen?style=plastic&logo=Python)](https://pypi.org/project/optimas-ai/)
 [![](https://img.shields.io/badge/doc-online-blue?style=plastic&logo=Read%20the%20Docs)](https://optimas.stanford.edu/docs/getting-started/introduction)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -110,15 +110,17 @@ Example:
 
 Please consider citing our paper if you use our benchmark or code in your work:
 ```
-@inproceedings{optimas,
+@article{optimas,
     title        = {Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards},
     author       = {
         Shirley Wu and Parth Sarthi and Shiyu Zhao and
         Aaron Lee and Herumb Shandilya and
         Adrian Mladenic Grobelnik and Nurendra Choudhary and
-       Eddie Huang and Karthik Subbian and Linjun Zhang and Diyi Yang and
+        Eddie Huang and Karthik Subbian and 
+        Linjun Zhang and Diyi Yang and
         James Zou and Jure Leskovec
     },
-    year  = {2025}
+    year        = {2025},
+    journal     = {arXiv preprint arXiv:2507.03041},
 }
 ```
