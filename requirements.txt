@@ -1,0 +1,38 @@
+# Core ML/AI libraries
+torch
+transformers
+datasets
+numpy
+peft
+trl
+accelerate
+
+# Experiment tracking and logging
+wandb
+
+# Data manipulation and visualization  
+pandas
+matplotlib
+networkx
+
+# Progress bars and CLI
+tqdm
+rich
+
+# Configuration and utilities
+omegaconf
+python-dotenv
+requests
+huggingface_hub
+litellm
+
+# DSPy for prompt optimization (MIPRO/COPRO)
+dspy
+
+# Optional dependencies for adapters (install as needed)
+# pydantic  # for CrewAI adapter
+# textgrad  # for TextGrad adapter
+# crewai  # for CrewAI adapter
+# autogen-agentchat  # for AutoGen adapter
+# autogen-ext  # for AutoGen adapter  
+# agents  # for OpenAI agents adapter
