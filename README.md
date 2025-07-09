@@ -4,7 +4,7 @@
 </div>
 
 <h1 align="left">
-    Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards
+    [In preparation] Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards
 </h1>
 
 <div align="left">
