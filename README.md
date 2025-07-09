@@ -4,7 +4,7 @@
 </div>
 
 <h1 align="left">
-    [In preparation] Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards
+    Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards
 </h1>
 
 <div align="left">
@@ -16,6 +16,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 </div>
 
+The repo is currently under preparation and we will release the full implementation as soon as possible!
 
 ## NEWS
 - **[Jul 2025]** We release Optimas!
