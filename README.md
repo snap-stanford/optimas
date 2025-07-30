@@ -47,7 +47,7 @@ Output: HuggingFace-style reward dataset saved locally.
 
 ## 2. Train Initial Reward Model (Local Reward Functions)
 
-`CUDA_VISIBLE_DEVICES=2,3,4,5 torchrun --master_port=56780 --nnodes=1 --nproc_per_node=4 -m scripts.train_reward_model scripts/configs/train/{dataset}.yaml`
+`CUDA_VISIBLE_DEVICES=2,3,4,5 torchrun --master_port=56781 --nnodes=1 --nproc_per_node=4 -m scripts.train_reward_model scripts/configs/train/{dataset}.yaml`
 
 where `nnodes` is the number of number of nodes, and `nproc_per_node` is the number of GPUs per node.
 
