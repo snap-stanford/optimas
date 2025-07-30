@@ -109,7 +109,7 @@ def main():
         )
     ds = reward_dataset.to_preference_dataset(
         eval_ratio=args.eval_ratio,
-        add_margin=training_args.add_margin
+        add_margin=args.add_margin
     )
 
     num_labels = len(system.optimizable_components) if args.train_multi_head else 1

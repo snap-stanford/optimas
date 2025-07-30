@@ -51,19 +51,19 @@ class RewardConfig(TrainingArguments):
             "you want to use the default data collator."
         },
     )
-    add_margin: bool = field(
-        default=True,
-        metadata={
-            "help": "Whether to add a margin to the reward model loss. If `True`, the reward model will be trained to "
-            "output rewards that are greater than or equal to the margin."
-        },
-    )
-    eval_ratio: float = field(
-        default=0.1,
-        metadata={
-            "help": "Ratio of the dataset to use for evaluation. If `0`, no evaluation will be performed."
-        },
-    )
+    # add_margin: bool = field(
+    #     default=True,
+    #     metadata={
+    #         "help": "Whether to add a margin to the reward model loss. If `True`, the reward model will be trained to "
+    #         "output rewards that are greater than or equal to the margin."
+    #     },
+    # )
+    # eval_ratio: float = field(
+    #     default=0.1,
+    #     metadata={
+    #         "help": "Ratio of the dataset to use for evaluation. If `0`, no evaluation will be performed."
+    #     },
+    # )
     disable_dropout: bool = field(
         default=True,
         metadata={"help": "Whether to disable dropout in the model and reference model."},
