@@ -1,0 +1,13 @@
+run_name: unoptimized
+dataset: pubmed
+system_name: pubmed_system
+num_repeat: 3
+split: test
+
+system_state_dict_path: null # Specify the optimized system state dict path if available
+output_dir: outputs/eval
+
+# Optional
+dotenv_path: .env
+max_sample_workers: 4
+max_eval_workers: 4

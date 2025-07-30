@@ -1,0 +1,51 @@
+# Dataset and pipeline
+dataset: pubmed
+system: pubmed_system
+wandb_run_name: iter100-valsize20-trainsize20
+val_size: 10
+per_iteration_new_data_size: 20
+per_component_search_size: 20
+per_component_train_size: 20
+per_iteration_rm_train_size: 128
+
+# Paths
+output_dir: outputs/optim
+state_dict_path: outputs/reward_model/pubmed_system/full-256/state_dict.pth # an example path
+preference_dataset: snap-stanford/pubmed_system
+
+# LoRA
+lora_r: 32
+lora_alpha: 16
+lora_dropout: 0.0
+add_margin: true
+
+# Iteration & optimization
+num_iterations: 100
+num_prompt_candidates: 3
+
+# Replay buffer
+use_replay_buffer: true
+replay_buffer_size: 100
+max_sample_workers: 4
+num_repeat: 1
+
+# Environment
+dotenv_path: .env
+
+# Reward model
+do_train: true
+per_device_train_batch_size: 1
+per_device_eval_batch_size: 1
+gradient_accumulation_steps: 8
+learning_rate: 0.000001
+num_train_epochs: 1
+max_length: 2048
+logging_steps: 10
+eval_steps: 8
+save_steps: 50
+eval_strategy: "steps"
+metric_for_best_model: eval_loss
+load_best_model_at_end: false
+use_score_scaling: false
+use_score_norm: false
+ddp_find_unused_parameters: false
