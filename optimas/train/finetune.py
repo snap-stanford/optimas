@@ -65,17 +65,8 @@ def run_finetune(
     if os.environ.get("LOCAL_RANK", "0") == "0":
         logger.info(f"Trainable parameters: {trainable:,} / {total:,} ({trainable / total * 100:.2f}%)")
         logger.info("--- Reward model train started ---")
-        # if do_eval:
-        #     eval_results = trainer.evaluate()
-        #     logger.info(f"Metrics (before adapt): eval accuracy = {eval_results['eval_accuracy']} | loss = {eval_results['eval_loss']}")
 
     logger.info(f"Reward model train size: {len(trainer.train_dataset)}")
     trainer.train()
-
-    # if os.environ.get("LOCAL_RANK", "0") == "0":
-    #     logger.info("--- Reward model train completed ---")
-    #     if do_eval:
-    #         eval_results = trainer.evaluate()
-    #         logger.info(f"Metrics (after adapt): eval accuracy = {eval_results['eval_accuracy']} | loss = {eval_results['eval_loss']}")
 
     return trainer

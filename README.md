@@ -59,7 +59,7 @@ export WANDB_PROJECT=your_wandb_project
 
 ## 3. Run Optimization (Prompts, PPO LoRA, Hyperparameters)
 
-`CUDA_VISIBLE_DEVICES=2,3,4,5 torchrun --master_port=56790 --nnodes=1 --nproc_per_node=4 -m scripts.optimize_system scripts/configs/optimize/{dataset}.yaml`
+`CUDA_VISIBLE_DEVICES=6 torchrun --master_port=56790 --nnodes=1 --nproc_per_node=1 -m scripts.optimize_system scripts/configs/optimize/{dataset}.yaml`
 
 Uses Globally Aligned Local Reward Functions (LRFs) to optimize component variables.
 Supports:

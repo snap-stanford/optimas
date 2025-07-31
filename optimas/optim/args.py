@@ -51,7 +51,7 @@ class OptimasArguments:
         metadata={"help": "Number of forward passes for reward estimation."}
     )
     num_samples: int = field(
-        default=1,
+        default=3,
         metadata={"help": "Number of times to repeat each sample."}
     )
     num_repeats: int = field(

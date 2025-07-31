@@ -270,10 +270,13 @@ class OptimasOptimizer:
         self.training_args.logging_dir = component_output_dir
 
         # Load dataset
-        reward_dataset = RewardDataset(hf_repo_or_local_dir, self.system)
-
+        reward_dataset = RewardDataset(
+            system=self.system,
+            hf_repo_or_local_dir=hf_repo_or_local_dir, 
+            original_dataset=self.train_dataset + self.val_dataset,
+        )
         # Format the dataset
-        ds = reward_dataset.to_preference_dataset(eval_ratio=self.training_args.eval_ratio, add_margin=self.training_args.add_margin)
+        ds = reward_dataset.to_preference_dataset(eval_ratio=self.training_args.eval_ratio, add_margin=self.training_args.add_margin) 
 
         if per_iteration_rm_train_size != -1:
             # shuffle and take the first per_iteration_rm_train_size samples
@@ -283,7 +286,7 @@ class OptimasOptimizer:
             train_list = train_list[:per_iteration_rm_train_size]
             ds["train"] = Dataset.from_list(train_list)
         # Otherwise use the full reward dataset
-
+        
         # Train the reward model
         trainer = run_finetune(
             ds,
