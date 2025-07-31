@@ -7,7 +7,7 @@ per_iteration_new_data_size: 20
 per_component_search_size: 20
 per_component_train_size: 20
 per_iteration_rm_train_size: 128
-
+ 
 # Paths
 output_dir: outputs/optim
 state_dict_path: /outputs/reward_model/hotpotqa_system/full-20000/state_dict.pth # an example path
