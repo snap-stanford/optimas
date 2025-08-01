@@ -176,7 +176,7 @@ if __name__ == "__main__":
                 json.dump(metrics, f, sort_keys=True, indent=2)
 
             wandb.log(
-                {   "iteration": args.num_iterations,
+                {   "iteration": optimas_args.num_iterations,
                     "test/score": metrics["mean"],
                     "test/std": metrics["std"],
                 }
@@ -204,7 +204,7 @@ if __name__ == "__main__":
             "timestamp": datetime.datetime.now().isoformat(),
             "system": args.system,
             "dataset": args.dataset,
-            "iterations": args.num_iterations,
+            "iterations": optimas_args.num_iterations,
             "initial_score": history["overall_performance"][0],
             "final_score": history["overall_performance"][-1],
             "improvement": improvement,

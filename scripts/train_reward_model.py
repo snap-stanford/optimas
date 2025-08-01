@@ -40,8 +40,6 @@ class ScriptArgs:
     lora_r: int = 16
     lora_alpha: int = 8
     lora_dropout: float = 0.05
-    add_margin: bool = False
-    eval_ratio: float = 0.10
     early_stopping_patience: int = 512
 
     state_dict_path: Optional[str] = None
@@ -108,8 +106,8 @@ def main():
         original_dataset=trainset + valset
         )
     ds = reward_dataset.to_preference_dataset(
-        eval_ratio=args.eval_ratio,
-        add_margin=args.add_margin
+        eval_ratio=training_args.eval_ratio,
+        add_margin=training_args.add_margin
     )
 
     num_labels = len(system.optimizable_components) if args.train_multi_head else 1
