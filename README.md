@@ -109,7 +109,6 @@ Example:
 
 ## Reference
 
-Please consider citing our paper if you use our benchmark or code in your work:
 ```
 @article{optimas,
     title        = {Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards},
