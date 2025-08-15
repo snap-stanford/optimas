@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Any
 
 
 @dataclass
@@ -75,7 +75,7 @@ class OptimasArguments:
         default="opro",
         metadata={
             "help": "Prompt optimization method.",
-            "choices": ["opro", "mipro", "copro"],
+            "choices": ["opro", "mipro", "copro", "gepa"],
             },
     )
     num_threads: int = field(
@@ -105,7 +105,89 @@ class OptimasArguments:
         metadata={"help": "Meta prompt preamble template for OPRO (use {component_description} placeholder)"}
     )
 
-    # ------ COPRO -----
+    # ----------- GEPA -----------
+    gepa_auto: str = field(
+        default=None,
+        metadata={"help": "GEPA auto budget: one of 'light', 'medium', 'heavy', or None (manual)"}
+    )
+    gepa_max_full_evals: int = field(
+        default=None,
+        metadata={"help": "GEPA: maximum number of full evaluations (if not using auto)"}
+    )
+    gepa_max_metric_calls: int = field(
+        default=None,
+        metadata={"help": "GEPA: maximum number of metric calls (if not using auto)"}
+    )
+    gepa_reflection_minibatch_size: int = field(
+        default=3,
+        metadata={"help": "GEPA: number of examples for reflection in a single step"}
+    )
+    gepa_candidate_selection_strategy: str = field(
+        default="pareto",
+        metadata={"help": "GEPA: candidate selection strategy ('pareto' or 'current_best')"}
+    )
+    gepa_skip_perfect_score: bool = field(
+        default=True,
+        metadata={"help": "GEPA: skip perfect score candidates during optimization"}
+    )
+    gepa_use_merge: bool = field(
+        default=True,
+        metadata={"help": "GEPA: use merge-based optimization"}
+    )
+    gepa_max_merge_invocations: int = field(
+        default=5,
+        metadata={"help": "GEPA: maximum number of merge invocations"}
+    )
+    gepa_num_threads: int = field(
+        default=1,
+        metadata={"help": "GEPA: number of threads for evaluation"}
+    )
+    gepa_failure_score: float = field(
+        default=0.0,
+        metadata={"help": "GEPA: score to assign to failed examples"}
+    )
+    gepa_perfect_score: float = field(
+        default=1.0,
+        metadata={"help": "GEPA: maximum achievable score"}
+    )
+    gepa_log_dir: str = field(
+        default=None,
+        metadata={"help": "GEPA: directory to save logs and artifacts"}
+    )
+    gepa_track_stats: bool = field(
+        default=False,
+        metadata={"help": "GEPA: return detailed results and all proposed programs"}
+    )
+    gepa_use_wandb: bool = field(
+        default=False,
+        metadata={"help": "GEPA: use wandb for logging"}
+    )
+    gepa_track_best_outputs: bool = field(
+        default=False,
+        metadata={"help": "GEPA: track best outputs on the validation set (requires track_stats=True)"}
+    )
+    gepa_seed: int = field(
+        default=0,
+        metadata={"help": "GEPA: random seed for reproducibility"}
+    )
+    gepa_num_iters: int = field(
+        default=None,
+        metadata={"help": "GEPA: number of optimization iterations (mutually exclusive with max_metric_calls)"}
+    )
+    gepa_logger: Any = field(
+        default=None,
+        metadata={"help": "GEPA: custom logger instance (advanced, optional)"}
+    )
+    gepa_wandb_api_key: str = field(
+        default=None,
+        metadata={"help": "GEPA: wandb API key (optional)"}
+    )
+    gepa_wandb_init_kwargs: dict = field(
+        default=None,
+        metadata={"help": "GEPA: wandb.init kwargs (optional)"}
+    )
+
+    # ------ COPRO ------
     copro_depth: int = field(default=2, metadata={"help": "Number of optimization iterations per prompt."})
 
     # ----- MIPRO ------

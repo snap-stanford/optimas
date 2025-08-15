@@ -70,6 +70,33 @@ Each component can be optimized independently or jointly.
 
 Remember to include WANDB_ENTITY and WANDB_PROJECT in the `.env` file or export them in your shell.
 
+## Advanced: Using GEPA with Custom Adapters and Logging
+
+Optimas supports GEPA as a prompt optimizer, with deep integration for DSPy-based systems. For advanced users, you can:
+
+- **Use a custom GEPAAdapter for non-DSPy systems:**
+  - Implement the `GEPAAdapter` interface (see the [gepa documentation](https://github.com/gepa-ai/gepa) and `src/gepa/core/adapter.py`).
+  - Pass your adapter instance to the GEPA optimizer logic in your pipeline (requires minor code changes to Optimas, or subclassing the optimizer to inject your adapter).
+  - This allows you to optimize arbitrary text-based systems, not just DSPy modules.
+
+- **Pass a custom logger or wandb config to GEPA:**
+  - You can set `gepa_logger`, `gepa_wandb_api_key`, and `gepa_wandb_init_kwargs` in your OptimasArguments/config to control logging and experiment tracking.
+  - Example YAML config snippet:
+    ```yaml
+    prompt_optimizer: gepa
+    gepa_logger: my_custom_logger_instance  # (Python object, if using programmatic config)
+    gepa_wandb_api_key: "your_wandb_api_key"
+    gepa_wandb_init_kwargs:
+      project: "my-gepa-project"
+      entity: "my-wandb-entity"
+    ```
+  - These will be passed directly to the underlying GEPA engine.
+
+- **Budgeting:**
+  - You can control the optimization budget using `gepa_max_metric_calls` or `gepa_num_iters` (mutually exclusive).
+
+For more details, see the [GEPA documentation](https://github.com/gepa-ai/gepa) and the DSPy [GEPAAdapter example](https://github.com/stanfordnlp/dspy/blob/main/dspy/teleprompt/gepa/gepa_utils.py).
+
 ## 4. Evaluate Final System
 
 `python scripts/eval_system.py scripts/configs/eval/{dataset}.yaml`
