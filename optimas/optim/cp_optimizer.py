@@ -427,6 +427,49 @@ class ComponentOptimizer:
                 eval_kwargs=eval_kwargs
             ).signature
             new_variable = new_signature.instructions
+        elif self.args.prompt_optimizer == "gepa":
+            try:
+                import dspy
+                from dspy.teleprompt.gepa import GEPA
+            except ImportError:
+                raise ImportError("DSPy and gepa must be installed to use GEPA optimizer.")
+            if not hasattr(component, "signature_cls"):
+                raise ValueError("GEPA optimizer is only supported for DSPy-based components.")
+            logger.info(f"Running GEPA for component {component_name} ...")
+            old_signature_cls = component.signature_cls.with_instructions(component.variable)
+            reflection_lm = dspy.LM(**vars(component.config), cache=False)
+            gepa_kwargs = dict(
+                metric=metric_from_rm_or_global_metric,
+                auto=self.args.gepa_auto,
+                max_full_evals=self.args.gepa_max_full_evals,
+                max_metric_calls=self.args.gepa_max_metric_calls,
+                num_iters=self.args.gepa_num_iters,
+                reflection_minibatch_size=self.args.gepa_reflection_minibatch_size,
+                candidate_selection_strategy=self.args.gepa_candidate_selection_strategy,
+                reflection_lm=reflection_lm,
+                skip_perfect_score=self.args.gepa_skip_perfect_score,
+                use_merge=self.args.gepa_use_merge,
+                max_merge_invocations=self.args.gepa_max_merge_invocations,
+                num_threads=self.args.gepa_num_threads,
+                failure_score=self.args.gepa_failure_score,
+                perfect_score=self.args.gepa_perfect_score,
+                log_dir=self.args.gepa_log_dir,
+                track_stats=self.args.gepa_track_stats,
+                use_wandb=self.args.gepa_use_wandb,
+                wandb_api_key=getattr(self.args, 'gepa_wandb_api_key', None),
+                wandb_init_kwargs=getattr(self.args, 'gepa_wandb_init_kwargs', None),
+                track_best_outputs=self.args.gepa_track_best_outputs,
+                seed=self.args.gepa_seed,
+                logger=getattr(self.args, 'gepa_logger', None),
+            )
+            # Remove None values (for optional args)
+            gepa_kwargs = {k: v for k, v in gepa_kwargs.items() if v is not None}
+            tp = GEPA(**gepa_kwargs)
+            new_signature = tp.compile(
+                dspy.Predict(old_signature_cls),
+                trainset=trainset_per_component,
+            ).signature
+            new_variable = new_signature.instructions
         else:
             raise ValueError(f"Invalid prompt optimizer: {self.args.prompt_optimizer}")
 

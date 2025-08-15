@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel", "uv>=0.1"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "optimas"
+version = "0.1.0"
+description = "Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards"
+authors = [
+    { name = "Optimas Contributors", email = "opensource@optimas.ai" }
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+requires-python = ">=3.9, <3.13"
+dependencies = [
+    "torch",
+    "transformers",
+    "datasets",
+    "numpy",
+    "peft",
+    "trl",
+    "accelerate",
+    "wandb",
+    "pandas",
+    "matplotlib",
+    "networkx",
+    "tqdm",
+    "rich",
+    "omegaconf",
+    "python-dotenv",
+    "requests",
+    "huggingface_hub",
+    "litellm",
+    "dspy>=3.0.1",
+    # Optional: "gepa",  # for GEPA optimizer
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "black",
+    "isort",
+    "pre-commit",
+    "pip-tools",
+    "uv",
+]
+test = [
+    "pytest",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["optimas"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "B", "I", "UP", "C90", "N", "D", "A", "C4", "T20", "Q"]
+ignore = ["E501"]
+exclude = [".git", ".venv", "venv", "build", "dist", "_build", "optimas/tests/data"]
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.pre-commit]
+hooks = [
+    { id = "ruff", name = "ruff", entry = "ruff check .", language = "system", types = ["python"] },
+    { id = "black", name = "black", entry = "black .", language = "system", types = ["python"] },
+    { id = "isort", name = "isort", entry = "isort .", language = "system", types = ["python"] },
+]
+
+# To build: `uv pip install .` or `pip install .`
+# To lock: `uv pip compile pyproject.toml > requirements.lock` or use pip-tools
