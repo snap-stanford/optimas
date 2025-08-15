@@ -6,9 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Added
-- Initial open source structure with pyproject.toml, pre-commit, ruff, black, isort, and uv support.
 - GEPA optimizer integration and tests.
-- CONTRIBUTING.md and documentation improvements.
 
 ### Changed
 - Project structure and packaging improvements.
@@ -16,6 +14,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Fixed
 - N/A
 
-## [0.1.0] - YYYY-MM-DD
+## [0.1.0] - 2025-08-01
 ### Added
 - First public release of Optimas.
