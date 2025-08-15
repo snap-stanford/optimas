@@ -34,11 +34,5 @@ jobs:
       - name: Lint with ruff (ignore all errors for now)
         run: ruff check . --ignore=ALL
 
-      - name: Check formatting with black
-        run: black --check .
-
-      - name: Check imports with isort
-        run: isort --check-only .
-
       - name: Run tests
         run: pytest

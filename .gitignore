@@ -6,6 +6,16 @@ __pycache__/
 # C extensions
 *.so
 
+
+# Data and Models and Results and Outputs
+wandb/
+outputs/
+torchtune/
+logs/
+examples/data/stark
+checkpoints/
+local_lm/
+
 # Distribution / packaging
 .Python
 build/
