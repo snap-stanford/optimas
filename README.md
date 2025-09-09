@@ -70,77 +70,24 @@ Each component can be optimized independently or jointly.
 
 Remember to include WANDB_ENTITY and WANDB_PROJECT in the `.env` file or export them in your shell.
 
-## 🚀 Local Testing on Apple Silicon (M4 Mac Max)
+## 🚀 GEPA Integration
 
-For local development and testing, especially on Apple Silicon with ample RAM:
+Optimas includes GEPA (Generate, Evaluate, Predict, and Adapt) for automatic prompt optimization.
 
-### Quick Local Setup
 ```bash
-# Install with uv (recommended)
-uv pip install -e ".[dev]"
+# Quick demo with local models
+ollama pull llama3.1:8b && ollama pull qwen3:8b
 
-# Test core functionality (no API keys needed)
-python -c "from optimas.arch.system import CompoundAISystem; print('✅ Optimas ready!')"
+# Basic GEPA demo (BaseComponent)
+python examples/gepa/demo_gepa.py
 
-# Run GEPA integration demo
-python examples/universal_gepa_demo.py --quick-test
+# DSPy vs BaseComponent comparison
+python examples/gepa/demo_gepa_dspy.py
 ```
 
-### Using Local Models with Ollama
-```bash
-# Install Ollama for local LLM inference
-curl -fsSL https://ollama.ai/install.sh | sh
+**GEPA works with both DSPy signatures and BaseComponent classes**, automatically detecting the framework and using the appropriate optimization path.
 
-# Pull recommended models for M4 Mac Max (128GB RAM)
-ollama pull llama3.1:8b      # Fast development (~5GB RAM)
-ollama pull qwen2.5:14b      # Good quality (~9GB RAM) 
-ollama pull llama3.1:70b     # Best quality (~80GB RAM)
-
-# Configure for local use
-export OPTIMAS_USE_LOCAL=true
-export OLLAMA_BASE_URL="http://localhost:11434"
-```
-
-### Verification Tests
-```bash
-# Test original functionality is preserved
-pytest tests/ -v
-
-# Test GEPA integration doesn't break anything  
-python resources/testing/test_gepa_integration.py --quick
-
-# Test with local Ollama models
-python resources/testing/test_gepa_local.py --model llama3.1:8b
-```
-
-📖 **See [LOCAL_TESTING_GUIDE.md](resources/guides/LOCAL_TESTING_GUIDE.md) for comprehensive testing instructions and troubleshooting.**
-
-## Advanced: Using GEPA with Custom Adapters and Logging
-
-Optimas supports GEPA as a prompt optimizer, with deep integration for DSPy-based systems. For advanced users, you can:
-
-- **Use a custom GEPAAdapter for non-DSPy systems:**
-  - Implement the `GEPAAdapter` interface (see the [gepa documentation](https://github.com/gepa-ai/gepa) and `src/gepa/core/adapter.py`).
-  - Pass your adapter instance to the GEPA optimizer logic in your pipeline (requires minor code changes to Optimas, or subclassing the optimizer to inject your adapter).
-  - This allows you to optimize arbitrary text-based systems, not just DSPy modules.
-
-- **Pass a custom logger or wandb config to GEPA:**
-  - You can set `gepa_logger`, `gepa_wandb_api_key`, and `gepa_wandb_init_kwargs` in your OptimasArguments/config to control logging and experiment tracking.
-  - Example YAML config snippet:
-    ```yaml
-    prompt_optimizer: gepa
-    gepa_logger: my_custom_logger_instance  # (Python object, if using programmatic config)
-    gepa_wandb_api_key: "your_wandb_api_key"
-    gepa_wandb_init_kwargs:
-      project: "my-gepa-project"
-      entity: "my-wandb-entity"
-    ```
-  - These will be passed directly to the underlying GEPA engine.
-
-- **Budgeting:**
-  - You can control the optimization budget using `gepa_max_metric_calls` or `gepa_num_iters` (mutually exclusive).
-
-For more details, see the [GEPA documentation](https://github.com/gepa-ai/gepa) and the DSPy [GEPAAdapter example](https://github.com/stanfordnlp/dspy/blob/main/dspy/teleprompt/gepa/gepa_utils.py).
+📖 **See [examples/gepa/GEPA_GUIDE.md](examples/gepa/GEPA_GUIDE.md) for complete setup and usage instructions.**
 
 ## 4. Evaluate Final System
 
