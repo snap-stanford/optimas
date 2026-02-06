@@ -108,7 +108,7 @@ Example:
 ## Reference
 
 ```
-@article{optimas,
+@inproceedings{optimas,
     title        = {Optimas: Optimizing Compound AI Systems with Globally Aligned Local Rewards},
     author       = {
         Shirley Wu and Parth Sarthi and Shiyu Zhao and
@@ -118,7 +118,7 @@ Example:
         Linjun Zhang and Diyi Yang and
         James Zou and Jure Leskovec
     },
-    year        = {2025},
-    journal     = {arXiv preprint arXiv:2507.03041},
+    year        = {2026},
+    booktitle   = {ICLR},
 }
 ```
