@@ -36,3 +36,4 @@ dspy
 # autogen-agentchat  # for AutoGen adapter
 # autogen-ext  # for AutoGen adapter  
 # agents  # for OpenAI agents adapter
+# gepa  # for GEPA optimizer (install with: pip install gepa)

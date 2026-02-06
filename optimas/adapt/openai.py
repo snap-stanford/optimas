@@ -6,10 +6,13 @@ from OpenAI Agent instances.
 
 import asyncio
 import warnings
-from typing import List
+from typing import List, Dict, Any
 
 from optimas.arch.base import BaseComponent
 from optimas.adapt.utils import format_input_fields
+from optimas.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 # Attempt to import agents as an optional dependency
 try:
@@ -124,6 +127,79 @@ def create_component_from_openai(
             
             # Return response mapped to the specified output field
             return {output_fields[0]: output_content}
+
+        # ======================= GEPA Interface Methods =======================
+        
+        @property
+        def gepa_optimizable_components(self) -> Dict[str, str]:
+            """Return OpenAI Agent-specific optimizable components."""
+            components = {}
+            
+            # Add agent instructions as primary optimizable component
+            if hasattr(self.agent, 'instructions') and self.agent.instructions:
+                components['instructions'] = self.agent.instructions
+            
+            # Add model-specific prompts if available
+            if hasattr(self.agent, 'system_prompt') and self.agent.system_prompt:
+                components['system_prompt'] = self.agent.system_prompt
+                
+            # Add function descriptions if available
+            if hasattr(self.agent, 'functions') and self.agent.functions:
+                function_descriptions = []
+                for func in self.agent.functions:
+                    if hasattr(func, 'description'):
+                        function_descriptions.append(func.description)
+                if function_descriptions:
+                    components['function_descriptions'] = '\n'.join(function_descriptions)
+                    
+            return components
+        
+        def apply_gepa_updates(self, updates: Dict[str, str]) -> None:
+            """Apply GEPA updates to OpenAI Agent components."""
+            if not updates:
+                return
+                
+            logger.info(f"Applying GEPA updates to OpenAI agent: {list(updates.keys())}")
+            
+            # Update instructions (primary variable)
+            if 'instructions' in updates:
+                self.agent.instructions = updates['instructions']
+                self.update(updates['instructions'])  # Update base component variable
+                logger.info(f"Updated agent instructions")
+            
+            # Update system prompt
+            if 'system_prompt' in updates:
+                if hasattr(self.agent, 'system_prompt'):
+                    self.agent.system_prompt = updates['system_prompt']
+                    logger.info(f"Updated agent system prompt")
+                    
+            # Update function descriptions (more complex - would need framework support)
+            if 'function_descriptions' in updates:
+                logger.info(f"Function description update requested (may require manual implementation)")
+        
+        def extract_execution_trace(self, inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Dict[str, Any]:
+            """Extract OpenAI Agent-specific execution traces."""
+            trace_info = super().extract_execution_trace(inputs, outputs)
+            
+            # Add OpenAI-specific trace information
+            trace_info.update({
+                "framework": "openai",
+                "agent_name": getattr(self.agent, 'name', ''),
+                "agent_model": getattr(self.agent, 'model', ''),
+                "agent_instructions": getattr(self.agent, 'instructions', ''),
+            })
+            
+            # Add function information if available
+            if hasattr(self.agent, 'functions') and self.agent.functions:
+                trace_info["available_functions"] = [
+                    getattr(func, 'name', str(func)) for func in self.agent.functions
+                ]
+            
+            # Add model configuration if available
+            if hasattr(self.agent, 'model_config'):
+                trace_info["model_config"] = self.agent.model_config
+                
+            return trace_info
 
     # Return initialized component instance
     return OpenAIAgentModule()

@@ -315,4 +315,129 @@ class BaseComponent:
             }
 
         return outputs
+
+    # ======================= GEPA Interface Methods =======================
+    
+    @property
+    def gepa_optimizable_components(self) -> Dict[str, str]:
+        """Return mapping of component_name -> optimizable_text for GEPA.
+        
+        This method identifies the text components that can be optimized by GEPA.
+        Default implementation handles simple string variables and some dict cases.
+        Override in subclasses for framework-specific text extraction.
+        
+        Returns:
+            Dict mapping component names to their current text values
+        """
+        if self._default_variable is None:
+            return {}
+        
+        if isinstance(self._default_variable, str):
+            # Simple case: single text variable
+            component_name = f"{self.__class__.__name__}_text"
+            return {component_name: self._default_variable}
+        
+        elif isinstance(self._default_variable, dict):
+            # Dict case: extract string values
+            text_components = {}
+            for key, value in self._default_variable.items():
+                if isinstance(value, str):
+                    text_components[key] = value
+            return text_components
+        
+        else:
+            # Fallback: convert to string representation
+            component_name = f"{self.__class__.__name__}_variable"
+            return {component_name: str(self._default_variable)}
+    
+    def apply_gepa_updates(self, updates: Dict[str, str]) -> None:
+        """Apply GEPA-optimized text updates to component.
+        
+        This method receives optimized text from GEPA and applies it to the component.
+        Default implementation handles simple cases. Override for framework-specific logic.
+        
+        Args:
+            updates: Dict mapping component names to optimized text
+        """
+        if not updates:
+            return
+        
+        logger.info(f"Applying GEPA updates to {self.__class__.__name__}: {list(updates.keys())}")
+        
+        current_components = self.gepa_optimizable_components
+        
+        if isinstance(self._default_variable, str):
+            # Simple case: single text variable
+            if len(updates) == 1:
+                new_text = next(iter(updates.values()))
+                self.update(new_text)
+            else:
+                logger.warning(f"Multiple updates provided for single-text component: {updates}")
+                
+        elif isinstance(self._default_variable, dict):
+            # Dict case: update matching keys
+            new_variable = self._default_variable.copy()
+            updated_keys = []
+            
+            for component_name, new_text in updates.items():
+                if component_name in new_variable:
+                    new_variable[component_name] = new_text
+                    updated_keys.append(component_name)
+                else:
+                    logger.warning(f"Unknown component '{component_name}' in updates")
+            
+            if updated_keys:
+                self.update(new_variable)
+                logger.info(f"Updated dict components: {updated_keys}")
+        
+        else:
+            # Fallback: replace entire variable with first update
+            if updates:
+                new_text = next(iter(updates.values()))
+                self.update(new_text)
+                logger.warning(f"Fallback update applied to non-text variable")
+    
+    def extract_execution_trace(self, inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract execution traces for GEPA reflection.
+        
+        This method extracts meaningful information from component execution
+        that can be used for GEPA's reflection-based optimization.
+        Override in subclasses to provide framework-specific trace data.
+        
+        Args:
+            inputs: Component inputs
+            outputs: Component outputs
+            
+        Returns:
+            Dict containing trace information for reflection
+        """
+        trace_info = {
+            "component_name": self.__class__.__name__,
+            "variable_used": self.variable,
+            "inputs_summary": self._summarize_data(inputs),
+            "outputs_summary": self._summarize_data(outputs),
+            "trajectory": getattr(self, 'traj', {})
+        }
+        
+        # Add config information if meaningful
+        config_dict = vars(self.config)
+        meaningful_config = {
+            k: v for k, v in config_dict.items() 
+            if k != 'randomize_variable' and v is not None
+        }
+        if meaningful_config:
+            trace_info["config"] = meaningful_config
+        
+        return trace_info
+    
+    def _summarize_data(self, data: Dict[str, Any], max_length: int = 200) -> Dict[str, str]:
+        """Summarize data for trace logging."""
+        summary = {}
+        for key, value in data.items():
+            value_str = str(value)
+            if len(value_str) > max_length:
+                summary[key] = value_str[:max_length] + "..."
+            else:
+                summary[key] = value_str
+        return summary
     

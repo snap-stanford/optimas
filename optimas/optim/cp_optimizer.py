@@ -427,6 +427,62 @@ class ComponentOptimizer:
                 eval_kwargs=eval_kwargs
             ).signature
             new_variable = new_signature.instructions
+        elif self.args.prompt_optimizer == "gepa":
+            logger.info(f"Running Universal GEPA for component {component_name} ...")
+            
+            # Import universal GEPA optimizer
+            from optimas.optim.universal_gepa import UniversalGEPAOptimizer
+            
+            # Create reflection LM
+            reflection_lm = self._create_reflection_lm(component)
+            
+            # Create universal GEPA optimizer
+            gepa_optimizer = UniversalGEPAOptimizer(
+                reflection_lm=reflection_lm,
+                auto_budget=self.args.gepa_auto,
+                max_full_evals=self.args.gepa_max_full_evals,
+                max_metric_calls=self.args.gepa_max_metric_calls,
+                num_iters=self.args.gepa_num_iters,
+                reflection_minibatch_size=self.args.gepa_reflection_minibatch_size,
+                candidate_selection_strategy=self.args.gepa_candidate_selection_strategy,
+                skip_perfect_score=self.args.gepa_skip_perfect_score,
+                use_merge=self.args.gepa_use_merge,
+                max_merge_invocations=self.args.gepa_max_merge_invocations,
+                num_threads=self.args.gepa_num_threads,
+                failure_score=self.args.gepa_failure_score,
+                perfect_score=self.args.gepa_perfect_score,
+                log_dir=self.args.gepa_log_dir,
+                track_stats=self.args.gepa_track_stats,
+                use_wandb=self.args.gepa_use_wandb,
+                wandb_api_key=getattr(self.args, 'gepa_wandb_api_key', None),
+                wandb_init_kwargs=getattr(self.args, 'gepa_wandb_init_kwargs', None),
+                track_best_outputs=self.args.gepa_track_best_outputs,
+                seed=self.args.gepa_seed,
+                max_workers=self.args.max_workers
+            )
+            
+            # Run optimization
+            result = gepa_optimizer.optimize_component(
+                component=component,
+                trainset=trainset_per_component,
+                valset=None,  # Could be added in the future
+                metric_fn=metric_from_rm_or_global_metric
+            )
+            
+            # Log results
+            logger.info(f"GEPA optimization completed for {component_name}")
+            logger.info(f"Framework type: {result.framework_type}")
+            logger.info(f"Optimized components: {result.optimized_components}")
+            logger.info(f"Final score: {result.final_score:.4f}")
+            logger.info(f"Total evaluations: {result.total_evaluations}")
+            
+            # Component is already updated by the optimizer
+            # Set new_variable for logging consistency
+            optimizable_components = component.gepa_optimizable_components
+            if optimizable_components and len(optimizable_components) == 1:
+                new_variable = next(iter(optimizable_components.values()))
+            else:
+                new_variable = str(result.best_candidate)
         else:
             raise ValueError(f"Invalid prompt optimizer: {self.args.prompt_optimizer}")
 
@@ -435,4 +491,61 @@ class ComponentOptimizer:
             logger.info(f"Optimized prompt for component '{component_name}': {new_variable}")
 
         self.system.components[component_name].update(new_variable)
+    
+    def _create_reflection_lm(self, component: BaseComponent) -> callable:
+        """Create reflection LM for GEPA optimization."""
+        # Try to use component's LM configuration first
+        if hasattr(component, 'config') and hasattr(component.config, 'model'):
+            try:
+                import dspy
+                reflection_lm = dspy.LM(**vars(component.config), cache=False)
+                
+                # Wrap for universal compatibility
+                def wrapped_reflection_lm(prompt):
+                    result = reflection_lm(prompt)
+                    if hasattr(result, 'content'):
+                        return result.content
+                    elif isinstance(result, list) and len(result) > 0:
+                        return result[0] 
+                    return str(result)
+                
+                return wrapped_reflection_lm
+            except Exception as e:
+                logger.warning(f"Failed to create DSPy LM from component config: {e}")
+        
+        # Fallback to creating LM with default model
+        try:
+            import dspy
+            reflection_lm = dspy.LM(model="gpt-4o-mini", cache=False)
+            
+            def wrapped_reflection_lm(prompt):
+                result = reflection_lm(prompt)
+                if hasattr(result, 'content'):
+                    return result.content
+                elif isinstance(result, list) and len(result) > 0:
+                    return result[0]
+                return str(result)
+            
+            logger.info("Using default GPT-4o-mini for GEPA reflection")
+            return wrapped_reflection_lm
+        except Exception as e:
+            logger.warning(f"Failed to create default DSPy LM: {e}")
+        
+        # Final fallback - use litellm directly
+        try:
+            import litellm
+            def litellm_reflection_lm(prompt):
+                response = litellm.completion(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}]
+                )
+                return response.choices[0].message.content
+            
+            logger.info("Using litellm GPT-4o-mini for GEPA reflection")
+            return litellm_reflection_lm
+        except Exception as e:
+            raise ImportError(
+                f"Failed to create reflection LM: {e}. "
+                "Please ensure DSPy or litellm is installed and configured."
+            )
 

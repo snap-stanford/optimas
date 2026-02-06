@@ -5,11 +5,14 @@ from CrewAI Agent instances.
 """
 
 import warnings
-from typing import List, Any, Type
+from typing import List, Any, Type, Dict
 
 from pydantic import BaseModel, create_model
 from optimas.arch.base import BaseComponent
 from optimas.adapt.utils import format_input_fields
+from optimas.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 # Attempt to import crewai as an optional dependency
 try:
@@ -124,6 +127,84 @@ def create_component_from_crewai(
             # Extract and return structured data
             data = result.pydantic.model_dump()
             return {field: data.get(field) for field in output_fields}
+
+        # ======================= GEPA Interface Methods =======================
+        
+        @property
+        def gepa_optimizable_components(self) -> Dict[str, str]:
+            """Return CrewAI-specific optimizable components."""
+            components = {}
+            
+            # Add agent backstory as primary optimizable component
+            if hasattr(self.agent, 'backstory') and self.agent.backstory:
+                components['backstory'] = self.agent.backstory
+            
+            # Add agent goal if different from description
+            if hasattr(self.agent, 'goal') and self.agent.goal:
+                components['goal'] = self.agent.goal
+                
+            # Add agent role
+            if hasattr(self.agent, 'role') and self.agent.role:
+                components['role'] = self.agent.role
+            
+            # Add system message if available
+            if hasattr(self.agent, 'system_message') and self.agent.system_message:
+                components['system_message'] = self.agent.system_message
+                
+            return components
+        
+        def apply_gepa_updates(self, updates: Dict[str, str]) -> None:
+            """Apply GEPA updates to CrewAI agent components."""
+            if not updates:
+                return
+                
+            logger.info(f"Applying GEPA updates to CrewAI agent: {list(updates.keys())}")
+            
+            # Update backstory (primary variable)
+            if 'backstory' in updates:
+                self.agent.backstory = updates['backstory']
+                self.update(updates['backstory'])  # Update base component variable
+                logger.info(f"Updated agent backstory")
+            
+            # Update goal
+            if 'goal' in updates:
+                self.agent.goal = updates['goal']
+                logger.info(f"Updated agent goal")
+            
+            # Update role
+            if 'role' in updates:
+                self.agent.role = updates['role']
+                logger.info(f"Updated agent role")
+                
+            # Update system message
+            if 'system_message' in updates:
+                if hasattr(self.agent, 'system_message'):
+                    self.agent.system_message = updates['system_message']
+                    logger.info(f"Updated agent system message")
+        
+        def extract_execution_trace(self, inputs: Dict[str, Any], outputs: Dict[str, Any]) -> Dict[str, Any]:
+            """Extract CrewAI-specific execution traces."""
+            trace_info = super().extract_execution_trace(inputs, outputs)
+            
+            # Add CrewAI-specific trace information
+            trace_info.update({
+                "framework": "crewai",
+                "agent_role": getattr(self.agent, 'role', ''),
+                "agent_goal": getattr(self.agent, 'goal', ''),
+                "agent_backstory": getattr(self.agent, 'backstory', ''),
+            })
+            
+            # Add tools information if available
+            if hasattr(self.agent, 'tools') and self.agent.tools:
+                trace_info["available_tools"] = [
+                    getattr(tool, 'name', str(tool)) for tool in self.agent.tools
+                ]
+            
+            # Add memory information if available  
+            if hasattr(self.agent, 'memory') and self.agent.memory:
+                trace_info["has_memory"] = True
+                
+            return trace_info
 
     # Return initialized component instance
     return CrewAIModule()

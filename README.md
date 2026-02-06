@@ -68,6 +68,25 @@ Each component can be optimized independently or jointly.
 
 Remember to include WANDB_ENTITY and WANDB_PROJECT in the `.env` file or export them in your shell.
 
+## 🚀 GEPA Integration
+
+Optimas includes GEPA (Generate, Evaluate, Predict, and Adapt) for automatic prompt optimization.
+
+```bash
+# Quick demo with local models
+ollama pull llama3.1:8b && ollama pull qwen3:8b
+
+# Basic GEPA demo (BaseComponent)
+python examples/gepa/demo_gepa.py
+
+# DSPy vs BaseComponent comparison
+python examples/gepa/demo_gepa_dspy.py
+```
+
+**GEPA works with both DSPy signatures and BaseComponent classes**, automatically detecting the framework and using the appropriate optimization path.
+
+📖 **See [examples/gepa/GEPA_GUIDE.md](examples/gepa/GEPA_GUIDE.md) for complete setup and usage instructions.**
+
 ## 4. Evaluate Final System
 
 `python scripts/eval_system.py scripts/configs/eval/{dataset}.yaml`
